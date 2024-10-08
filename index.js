@@ -2,8 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dbConnect = require('./dbConnect');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
 const User = require('./models/userModel');
 const createAccessToken = require('./token');
+const authRequired = require('./auth');
 const app = express();
 
 dbConnect();
@@ -29,6 +31,7 @@ app.use((request, response, next) => {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', function (req, res) {
   res.send('Hello');
@@ -122,9 +125,23 @@ app.post('/sign-in', async function (req, res) {
 });
 
 // Sign out
-app.post('/sign-out', async function (req, res) {
+app.post('/sign-out', function (req, res) {
   res.cookie('token', '', {
     expires: new Date(0),
   });
   return res.sendStatus(200);
+});
+
+// Get user account
+app.get('/account', authRequired, async function (req, res) {
+  const userFound = await User.findById(req.user.id);
+  if (!userFound) return res.status(400).json({ message: 'User not found' });
+
+  return res.json({
+    id: userFound._id,
+    firstName: userFound.firstName,
+    lastName: userFound.lastName,
+    email: userFound.email,
+    role: userFound.role,
+  });
 });
