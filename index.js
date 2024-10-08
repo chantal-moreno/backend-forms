@@ -120,3 +120,11 @@ app.post('/sign-in', async function (req, res) {
     res.status(500).json({ message: 'Error to Sign In', error: error.message });
   }
 });
+
+// Sign out
+app.post('/sign-out', async function (req, res) {
+  res.cookie('token', '', {
+    expires: new Date(0),
+  });
+  return res.sendStatus(200);
+});
