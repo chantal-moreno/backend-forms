@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const dbConnect = require('./dbConnect');
 const bcrypt = require('bcrypt');
 const User = require('./models/userModel');
+const createAccessToken = require('./token');
 const app = express();
 
 dbConnect();
@@ -45,6 +46,7 @@ app.post('/sign-up', async function (req, res) {
     });
   }
   try {
+    // New user
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       firstName,
@@ -53,6 +55,12 @@ app.post('/sign-up', async function (req, res) {
       password: hashedPassword,
     });
     await newUser.save();
+    // Token
+    const token = await createAccessToken({
+      id: newUser._id,
+    });
+    res.cookie('token', token);
+
     res.status(200).json({
       message: 'User created successfully',
       id: newUser._id,
