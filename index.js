@@ -74,3 +74,49 @@ app.post('/sign-up', async function (req, res) {
       .json({ message: 'Error creating user', error: error.message });
   }
 });
+
+// Sign in user
+app.post('/sign-in', async function (req, res) {
+  const { email, password } = req.body;
+
+  // Verify that all required fields are present
+  if (!email || !password) {
+    return response.status(400).send({
+      message: 'Missing required fields: email, and password are required.',
+    });
+  }
+  try {
+    const userFound = await User.findOne({ email });
+    if (!userFound)
+      return res.status(400).json({ message: 'Incorrect email or password' });
+
+    const isMatch = await bcrypt.compare(password, userFound.password);
+    if (!isMatch)
+      return res.status(400).json({ message: 'Incorrect email or password' });
+
+    // User blocked
+    if (userFound.status == 'Blocked') {
+      return res.status(400).json({
+        message: 'User account is blocked',
+      });
+    }
+    //Update lastLogin
+    userFound.lastLogin = new Date();
+    await userFound.save();
+    // Token
+    const token = await createAccessToken({
+      id: userFound._id,
+    });
+    res.cookie('token', token);
+
+    res.status(200).json({
+      message: 'Sign In successfully',
+      id: userFound._id,
+      firstName: userFound.firstName,
+      lastName: userFound.lastName,
+      email: userFound.email,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error to Sign In', error: error.message });
+  }
+});
