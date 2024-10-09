@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const User = require('./models/userModel');
 const createAccessToken = require('./token');
 const authRequired = require('./auth');
+const validateSchema = require('./validator');
+const { signUpSchema, signInSchema } = require('./authSchema');
 const app = express();
 
 dbConnect();
@@ -38,16 +40,9 @@ app.get('/', function (req, res) {
 });
 
 // Sign up user
-app.post('/sign-up', async function (req, res) {
+app.post('/sign-up', validateSchema(signUpSchema), async function (req, res) {
   const { firstName, lastName, email, password } = req.body;
 
-  // Verify that all required fields are present
-  if (!firstName || !lastName || !email || !password) {
-    return response.status(400).send({
-      message:
-        'Missing required fields: firstName, lastName, email, and password are required.',
-    });
-  }
   try {
     // New user
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -79,15 +74,9 @@ app.post('/sign-up', async function (req, res) {
 });
 
 // Sign in user
-app.post('/sign-in', async function (req, res) {
+app.post('/sign-in', validateSchema(signInSchema), async function (req, res) {
   const { email, password } = req.body;
 
-  // Verify that all required fields are present
-  if (!email || !password) {
-    return response.status(400).send({
-      message: 'Missing required fields: email, and password are required.',
-    });
-  }
   try {
     const userFound = await User.findOne({ email });
     if (!userFound)
