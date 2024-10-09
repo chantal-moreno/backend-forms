@@ -44,6 +44,10 @@ app.post('/sign-up', validateSchema(signUpSchema), async function (req, res) {
   const { firstName, lastName, email, password } = req.body;
 
   try {
+    const userFound = await User.findOne({ email });
+    if (userFound)
+      return res.status(400).json({ message: ['Already have an account'] });
+
     // New user
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
