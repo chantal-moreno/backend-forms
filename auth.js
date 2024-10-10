@@ -1,6 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
+const User = require('./models/userModel');
 
 const authRequired = (req, res, next) => {
   const { token } = req.cookies;
@@ -12,4 +13,14 @@ const authRequired = (req, res, next) => {
     next();
   });
 };
-module.exports = authRequired;
+
+const isAdmin = async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (user && user.role === 'admin') {
+    next();
+  } else {
+    return res.status(403).json({ message: 'Only admin' });
+  }
+};
+
+module.exports = { authRequired, isAdmin };

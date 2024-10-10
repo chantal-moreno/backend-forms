@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const User = require('./models/userModel');
 const createAccessToken = require('./token');
-const authRequired = require('./auth');
+const { authRequired, isAdmin } = require('./auth');
 const validateSchema = require('./validator');
 const { signUpSchema, signInSchema } = require('./authSchema');
 const app = express();
@@ -137,7 +137,7 @@ app.get('/account', authRequired, async function (req, res) {
 });
 
 // Get all users
-app.get('/all-users', authRequired, async (req, res) => {
+app.get('/all-users', authRequired, isAdmin, async (req, res) => {
   try {
     const users = await User.find({}).select(
       'firstName lastName email role status, lastLogin'
@@ -156,7 +156,7 @@ app.get('/all-users', authRequired, async (req, res) => {
 });
 
 // Block user
-app.put('/block/:id', authRequired, async (req, res) => {
+app.put('/block/:id', authRequired, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const userBlock = await User.findByIdAndUpdate(
@@ -178,7 +178,7 @@ app.put('/block/:id', authRequired, async (req, res) => {
 });
 
 // Unblock user
-app.put('/unblock/:id', authRequired, async (req, res) => {
+app.put('/unblock/:id', authRequired, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const userUnblock = await User.findByIdAndUpdate(
@@ -200,7 +200,7 @@ app.put('/unblock/:id', authRequired, async (req, res) => {
 });
 
 // Delete user
-app.delete('/delete/:id', authRequired, async (req, res) => {
+app.delete('/delete/:id', authRequired, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await User.findByIdAndDelete(userId);
@@ -218,7 +218,7 @@ app.delete('/delete/:id', authRequired, async (req, res) => {
 });
 
 // Add admin
-app.put('/add-admin/:id', authRequired, async (req, res) => {
+app.put('/add-admin/:id', authRequired, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const newAdmin = await User.findByIdAndUpdate(
@@ -240,7 +240,7 @@ app.put('/add-admin/:id', authRequired, async (req, res) => {
 });
 
 // Remove admin
-app.put('/remove-admin/:id', authRequired, async (req, res) => {
+app.put('/remove-admin/:id', authRequired, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const removeAdmin = await User.findByIdAndUpdate(
