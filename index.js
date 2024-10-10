@@ -45,8 +45,7 @@ app.post('/sign-up', validateSchema(signUpSchema), async function (req, res) {
 
   try {
     const userFound = await User.findOne({ email });
-    if (userFound)
-      return res.status(400).json({ message: ['Already have an account'] });
+    if (userFound) return res.status(400).json(['This email already exists']);
 
     // New user
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,12 +82,10 @@ app.post('/sign-in', validateSchema(signInSchema), async function (req, res) {
 
   try {
     const userFound = await User.findOne({ email });
-    if (!userFound)
-      return res.status(400).json({ message: 'Incorrect email or password' });
+    if (!userFound) return res.status(400).json(['Invalid email or password']);
 
     const isMatch = await bcrypt.compare(password, userFound.password);
-    if (!isMatch)
-      return res.status(400).json({ message: 'Incorrect email or password' });
+    if (!isMatch) return res.status(400).json(['Invalid email or password']);
 
     // User blocked
     if (userFound.status == 'Blocked') {
@@ -137,4 +134,129 @@ app.get('/account', authRequired, async function (req, res) {
     email: userFound.email,
     role: userFound.role,
   });
+});
+
+// Get all users
+app.get('/all-users', authRequired, async (req, res) => {
+  try {
+    const users = await User.find({}).select(
+      'firstName lastName email role status, lastLogin'
+    );
+
+    res.status(200).json({
+      message: 'Users retrieved successfully',
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error retrieving users',
+      error: error.message,
+    });
+  }
+});
+
+// Block user
+app.put('/block/:id', authRequired, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userBlock = await User.findByIdAndUpdate(
+      userId,
+      { $set: { status: 'Blocked' } },
+      { new: true }
+    );
+
+    if (!userBlock) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User blocked', userBlock });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error blocking user',
+      error: error.message,
+    });
+  }
+});
+
+// Unblock user
+app.put('/unblock/:id', authRequired, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userUnblock = await User.findByIdAndUpdate(
+      userId,
+      { $set: { status: 'Active' } },
+      { new: true }
+    );
+
+    if (!userUnblock) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User unblock', userUnblock });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error unblocking user',
+      error: error.message,
+    });
+  }
+});
+
+// Delete user
+app.delete('/delete/:id', authRequired, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User deleted', user });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error deleting user',
+      error: error.message,
+    });
+  }
+});
+
+// Add admin
+app.put('/add-admin/:id', authRequired, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const newAdmin = await User.findByIdAndUpdate(
+      userId,
+      { $set: { role: 'admin' } },
+      { new: true }
+    );
+
+    if (!newAdmin) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'New admin added', newAdmin });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error adding new admin',
+      error: error.message,
+    });
+  }
+});
+
+// Remove admin
+app.put('/remove-admin/:id', authRequired, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const removeAdmin = await User.findByIdAndUpdate(
+      userId,
+      { $set: { role: 'user' } },
+      { new: true }
+    );
+
+    if (!removeAdmin) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'Admin removed', removeAdmin });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error removing admin',
+      error: error.message,
+    });
+  }
 });
