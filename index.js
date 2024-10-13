@@ -8,6 +8,8 @@ const createAccessToken = require('./token');
 const { authRequired, isAdmin } = require('./auth');
 const validateSchema = require('./validator');
 const { signUpSchema, signInSchema } = require('./authSchema');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 const app = express();
 
 dbConnect();
@@ -17,7 +19,8 @@ app.listen(3000, () => {
 
 // CORS (Cross-Origin Resource Sharing)
 app.use((request, response, next) => {
-  response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  response.setHeader('Access-Control-Allow-Credentials', 'true');
   response.setHeader(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'
@@ -120,6 +123,28 @@ app.post('/sign-out', function (req, res) {
     expires: new Date(0),
   });
   return res.sendStatus(200);
+});
+
+// Verify token
+app.get('/verify', async function (req, res) {
+  const { token } = req.cookies;
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+  jwt.verify(token, JWT_SECRET, async (err, user) => {
+    if (err) return res.status(401).json({ message: 'Unauthorized' });
+
+    const userFound = await User.findById(user.id);
+    if (!userFound)
+      return res.status(401).json({ message: 'Unauthorized user not found' });
+
+    return res.status(200).json({
+      id: userFound._id,
+      firstName: userFound.firstName,
+      lastName: userFound.lastName,
+      email: userFound.email,
+      role: userFound.role,
+    });
+  });
 });
 
 // Get user account
