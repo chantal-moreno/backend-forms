@@ -165,7 +165,7 @@ app.get('/account', authRequired, async function (req, res) {
 app.get('/all-users', authRequired, isAdmin, async (req, res) => {
   try {
     const users = await User.find({}).select(
-      'firstName lastName email role status, lastLogin'
+      'firstName lastName email role status lastLogin'
     );
 
     res.status(200).json({
@@ -181,22 +181,22 @@ app.get('/all-users', authRequired, isAdmin, async (req, res) => {
 });
 
 // Block user
-app.put('/block/:id', authRequired, isAdmin, async (req, res) => {
+app.put('/block-users', authRequired, isAdmin, async (req, res) => {
   try {
-    const userId = req.params.id;
-    const userBlock = await User.findByIdAndUpdate(
-      userId,
-      { $set: { status: 'Blocked' } },
-      { new: true }
+    const { userIds } = req.body;
+    const usersBlocked = await User.updateMany(
+      { _id: { $in: userIds } },
+      { $set: { status: 'Blocked' } }
     );
 
-    if (!userBlock) {
-      return res.status(404).json({ message: 'User not found' });
+    if (usersBlocked.matchedCount === 0) {
+      return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'User blocked', userBlock });
+
+    res.status(200).json({ message: 'Users blocked', usersBlocked });
   } catch (error) {
     res.status(500).json({
-      message: 'Error blocking user',
+      message: 'Error blocking users',
       error: error.message,
     });
   }
