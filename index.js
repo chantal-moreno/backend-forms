@@ -224,18 +224,18 @@ app.put('/unblock-users', authRequired, isAdmin, async (req, res) => {
 });
 
 // Delete user
-app.delete('/delete/:id', authRequired, isAdmin, async (req, res) => {
+app.delete('/delete-users', authRequired, isAdmin, async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await User.findByIdAndDelete(userId);
+    const { userIds } = req.body;
+    const usersDeleted = await User.deleteMany({ _id: { $in: userIds } });
 
-    if (!user) {
+    if (!usersDeleted) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.status(200).json({ message: 'User deleted', user });
+    res.status(200).json({ message: 'Users deleted', usersDeleted });
   } catch (error) {
     res.status(500).json({
-      message: 'Error deleting user',
+      message: 'Error deleting users',
       error: error.message,
     });
   }
