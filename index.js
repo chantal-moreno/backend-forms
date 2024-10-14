@@ -263,22 +263,21 @@ app.put('/add-admins', authRequired, isAdmin, async (req, res) => {
 });
 
 // Remove admin
-app.put('/remove-admin/:id', authRequired, isAdmin, async (req, res) => {
+app.put('/remove-admins', authRequired, isAdmin, async (req, res) => {
   try {
-    const userId = req.params.id;
-    const removeAdmin = await User.findByIdAndUpdate(
-      userId,
-      { $set: { role: 'user' } },
-      { new: true }
+    const { userIds } = req.body;
+    const removeAdmins = await User.updateMany(
+      { _id: { $in: userIds } },
+      { $set: { role: 'user' } }
     );
 
-    if (!removeAdmin) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!removeAdmins) {
+      return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'Admin removed', removeAdmin });
+    res.status(200).json({ message: 'Admins removed', removeAdmins });
   } catch (error) {
     res.status(500).json({
-      message: 'Error removing admin',
+      message: 'Error removing admins',
       error: error.message,
     });
   }
