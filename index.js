@@ -203,22 +203,21 @@ app.put('/block-users', authRequired, isAdmin, async (req, res) => {
 });
 
 // Unblock user
-app.put('/unblock/:id', authRequired, isAdmin, async (req, res) => {
+app.put('/unblock-users', authRequired, isAdmin, async (req, res) => {
   try {
-    const userId = req.params.id;
-    const userUnblock = await User.findByIdAndUpdate(
-      userId,
-      { $set: { status: 'Active' } },
-      { new: true }
+    const { userIds } = req.body;
+    const usersUnblocked = await User.updateMany(
+      { _id: { $in: userIds } },
+      { $set: { status: 'Active' } }
     );
 
-    if (!userUnblock) {
-      return res.status(404).json({ message: 'User not found' });
+    if (usersUnblocked.matchedCount === 0) {
+      return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'User unblock', userUnblock });
+    res.status(200).json({ message: 'Users unblocked', usersUnblocked });
   } catch (error) {
     res.status(500).json({
-      message: 'Error unblocking user',
+      message: 'Error unblocking users',
       error: error.message,
     });
   }
