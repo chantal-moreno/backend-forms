@@ -242,22 +242,21 @@ app.delete('/delete-users', authRequired, isAdmin, async (req, res) => {
 });
 
 // Add admin
-app.put('/add-admin/:id', authRequired, isAdmin, async (req, res) => {
+app.put('/add-admins', authRequired, isAdmin, async (req, res) => {
   try {
-    const userId = req.params.id;
-    const newAdmin = await User.findByIdAndUpdate(
-      userId,
-      { $set: { role: 'admin' } },
-      { new: true }
+    const { userIds } = req.body;
+    const newAdmins = await User.updateMany(
+      { _id: { $in: userIds } },
+      { $set: { role: 'admin' } }
     );
 
-    if (!newAdmin) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!newAdmins) {
+      return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'New admin added', newAdmin });
+    res.status(200).json({ message: 'New admins added', newAdmins });
   } catch (error) {
     res.status(500).json({
-      message: 'Error adding new admin',
+      message: 'Error adding new admins',
       error: error.message,
     });
   }
