@@ -23,6 +23,7 @@ const signUP = async function (req, res) {
     // Token
     const token = await createAccessToken({
       id: newUser._id,
+      role: userFound.role,
     });
     res.cookie('token', token);
 
@@ -62,6 +63,7 @@ const signIN = async function (req, res) {
     // Token
     const token = await createAccessToken({
       id: userFound._id,
+      role: userFound.role,
     });
     res.cookie('token', token);
 
