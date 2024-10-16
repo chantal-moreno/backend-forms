@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authRequired, isAdmin } = require('../auth');
+const { authRequired, isAdmin, authOptional } = require('../auth');
 
 const templateController = require('../controllers/templateController');
 
@@ -9,6 +9,11 @@ router.put(
   '/update-template/:templateId',
   authRequired,
   templateController.updateTemplate
+);
+router.get(
+  '/template/:templateId',
+  authOptional,
+  templateController.getTemplate
 );
 
 module.exports = router;

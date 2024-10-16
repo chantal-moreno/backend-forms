@@ -23,4 +23,16 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { authRequired, isAdmin };
+const authOptional = (req, res, next) => {
+  const { token } = req.cookies;
+  if (!token) return next();
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return next();
+
+    req.user = user;
+    next();
+  });
+};
+
+module.exports = { authRequired, isAdmin, authOptional };
