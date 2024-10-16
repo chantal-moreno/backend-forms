@@ -15,5 +15,6 @@ router.get(
   authOptional,
   templateController.getTemplate
 );
+router.get('/latest-templates', templateController.latestTemplates);
 
 module.exports = router;

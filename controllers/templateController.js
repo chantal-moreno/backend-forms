@@ -142,8 +142,21 @@ const getTemplate = async (req, res) => {
   }
 };
 
+const latestTemplates = async (req, res) => {
+  try {
+    // Get templates sorted by creation date
+    const templates = await Template.find().sort({ createdAt: -1 });
+
+    res.status(200).json({ templates });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error getting templates' });
+  }
+};
+
 module.exports = {
   newTemplate,
   updateTemplate,
   getTemplate,
+  latestTemplates,
 };
