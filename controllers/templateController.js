@@ -183,10 +183,54 @@ const deleteTemplate = async (req, res) => {
   }
 };
 
+const addQuestion = async (req, res) => {
+  const { templateId } = req.params;
+  const { questionTitle, questionDescription, questionType, options, order } =
+    req.body;
+
+  try {
+    const template = await Template.findById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    // Verify creator or admin
+    if (
+      String(template.createdBy) !== String(req.user.id) &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        error: 'You do not have permission to edit this template',
+      });
+    }
+
+    const newQuestion = {
+      questionTitle,
+      questionDescription,
+      questionType,
+      options,
+      order,
+    };
+
+    await Template.findByIdAndUpdate(
+      templateId,
+      { $push: { questions: newQuestion } },
+      { new: true } // get update template
+    );
+
+    res.status(200).json({ message: 'Question added successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error adding question' });
+  }
+};
+
 module.exports = {
   newTemplate,
   updateTemplate,
   getTemplate,
   latestTemplates,
   deleteTemplate,
+  addQuestion,
 };

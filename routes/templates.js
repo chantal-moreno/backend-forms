@@ -21,5 +21,10 @@ router.delete(
   authRequired,
   templateController.deleteTemplate
 );
+router.post(
+  '/template/:templateId/add-question',
+  authRequired,
+  templateController.addQuestion
+);
 
 module.exports = router;
