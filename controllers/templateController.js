@@ -145,7 +145,9 @@ const getTemplate = async (req, res) => {
 const latestTemplates = async (req, res) => {
   try {
     // Get templates sorted by creation date
-    const templates = await Template.find().sort({ createdAt: -1 });
+    const templates = await Template.find()
+      .populate('createdBy', 'firstName lastName')
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ templates });
   } catch (err) {

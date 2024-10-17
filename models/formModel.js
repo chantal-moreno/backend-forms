@@ -13,12 +13,12 @@ const formResponseSchema = new mongoose.Schema(
   {
     templateId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Template',
+      ref: 'Templates',
       required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Users',
       required: true,
     },
     answers: [answerSchema],

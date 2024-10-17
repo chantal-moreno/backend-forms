@@ -21,8 +21,8 @@ const TemplateSchema = new mongoose.Schema(
     tags: [String],
     image: { type: String },
     isPublic: { type: Boolean, default: true },
-    allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
+    createdBy: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
   },
   {
     timestamps: true,
