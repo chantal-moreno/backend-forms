@@ -26,5 +26,10 @@ router.post(
   authRequired,
   templateController.addQuestion
 );
+router.post(
+  '/template/:templateId/update-question/:questionId',
+  authRequired,
+  templateController.updateQuestion
+);
 
 module.exports = router;

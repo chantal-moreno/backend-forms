@@ -226,6 +226,52 @@ const addQuestion = async (req, res) => {
   }
 };
 
+const updateQuestion = async (req, res) => {
+  const { templateId, questionId } = req.params;
+  const { questionTitle, questionDescription, questionType, options, order } =
+    req.body;
+
+  try {
+    const template = await Template.findById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    // Verify creator or admin
+    if (
+      String(template.createdBy) !== String(req.user.id) &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        error: 'You do not have permission to edit this template',
+      });
+    }
+
+    const question = template.questions.id(questionId);
+
+    if (!question) {
+      return res.status(404).json({ error: 'Question not found' });
+    }
+
+    // Update fields
+    if (questionTitle) question.questionTitle = questionTitle;
+    if (questionDescription) question.questionDescription = questionDescription;
+    if (questionType) question.questionType = questionType;
+    if (options) question.options = options;
+    if (order !== undefined) question.order = order;
+
+    await template.save();
+
+    res
+      .status(200)
+      .json({ message: 'Question updated successfully', question });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating question' });
+  }
+};
+
 module.exports = {
   newTemplate,
   updateTemplate,
@@ -233,4 +279,5 @@ module.exports = {
   latestTemplates,
   deleteTemplate,
   addQuestion,
+  updateQuestion,
 };
