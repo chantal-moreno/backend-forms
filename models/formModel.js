@@ -9,7 +9,7 @@ const answerSchema = new mongoose.Schema({
   answerText: { type: String, required: true },
 });
 
-const formResponseSchema = new Schema(
+const formResponseSchema = new mongoose.Schema(
   {
     templateId: {
       type: mongoose.Schema.Types.ObjectId,
