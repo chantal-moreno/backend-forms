@@ -272,6 +272,37 @@ const updateQuestion = async (req, res) => {
   }
 };
 
+const deleteQuestion = async (req, res) => {
+  const { templateId, questionId } = req.params;
+
+  try {
+    const template = await Template.findById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    // Verify creator or admin
+    if (
+      String(template.createdBy) !== String(req.user.id) &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        error: 'You do not have permission to edit this template',
+      });
+    }
+
+    template.questions.pull(questionId);
+
+    await template.save();
+
+    res.status(200).json({ message: 'Question deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting question' });
+  }
+};
+
 module.exports = {
   newTemplate,
   updateTemplate,
@@ -280,4 +311,5 @@ module.exports = {
   deleteTemplate,
   addQuestion,
   updateQuestion,
+  deleteQuestion,
 };
