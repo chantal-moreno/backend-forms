@@ -15,9 +15,17 @@ const questionSchema = new mongoose.Schema(
 const TemplateSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    description: { type: String },
-    questions: [questionSchema],
-    topic: { type: String },
+    description: { type: String, required: true },
+    questions: {
+      type: [questionSchema],
+      required: true,
+      validate: [arrayLimit, 'At least one question'],
+    },
+    topic: {
+      type: String,
+      required: true,
+      enum: ['Education', 'Personal', 'Work', 'Other'],
+    },
     tags: [String],
     image: { type: String },
     isPublic: { type: Boolean, default: true },
@@ -28,5 +36,9 @@ const TemplateSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+function arrayLimit(val) {
+  return val.length > 0;
+}
 
 module.exports = mongoose.model('Templates', TemplateSchema);
