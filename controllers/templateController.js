@@ -147,6 +147,19 @@ const getTemplate = async (req, res) => {
     res.status(500).json({ error: 'Error getting template' });
   }
 };
+const allTemplates = async (req, res) => {
+  try {
+    const templates = await Template.find().populate(
+      'createdBy',
+      'firstName lastName'
+    );
+
+    res.status(200).json({ templates });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error getting templates' });
+  }
+};
 
 const latestTemplates = async (req, res) => {
   try {
@@ -315,6 +328,7 @@ module.exports = {
   newTemplate,
   updateTemplate,
   getTemplate,
+  allTemplates,
   latestTemplates,
   deleteTemplate,
   addQuestion,

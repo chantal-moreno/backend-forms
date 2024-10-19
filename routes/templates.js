@@ -15,6 +15,7 @@ router.get(
   authOptional,
   templateController.getTemplate
 );
+router.get('/all-templates', templateController.allTemplates);
 router.get('/latest-templates', templateController.latestTemplates);
 router.delete(
   '/delete-template/:templateId',
