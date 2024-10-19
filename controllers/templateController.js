@@ -14,15 +14,21 @@ const newTemplate = async (req, res) => {
       image,
     } = req.body;
 
+    if (!questions || questions.length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'At least one question is required.' });
+    }
+
     const newTemplate = new Template({
       title,
       description,
       questions,
       topic,
-      tags,
+      tags: tags || [],
       isPublic: isPublic !== undefined ? isPublic : true,
       allowedUsers: allowedUsers || [],
-      image,
+      image: image || '',
       createdBy: req.user.id,
     });
 
@@ -36,7 +42,7 @@ const newTemplate = async (req, res) => {
     console.error(err);
     res
       .status(500)
-      .json({ message: 'Error creating template', error: error.message });
+      .json({ message: 'Error creating template', error: err.message });
   }
 };
 
