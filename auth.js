@@ -2,6 +2,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 const User = require('./models/userModel');
+const Template = require('./models/templateModel');
 
 const authRequired = (req, res, next) => {
   const { token } = req.cookies;
@@ -35,4 +36,36 @@ const authOptional = (req, res, next) => {
   });
 };
 
-module.exports = { authRequired, isAdmin, authOptional };
+const checkTemplateOwnership = async (req, res, next) => {
+  try {
+    const { templateId } = req.params;
+    const template = await Template.findById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ message: 'Template not found' });
+    }
+
+    if (
+      String(template.createdBy) !== String(req.user.id) &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        message: 'You do not have permission to perform this action',
+      });
+    }
+
+    next();
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ message: 'Server error', error: err.message });
+  }
+};
+
+module.exports = {
+  authRequired,
+  isAdmin,
+  authOptional,
+  checkTemplateOwnership,
+};

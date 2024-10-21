@@ -62,20 +62,6 @@ const updateTemplate = async (req, res) => {
   try {
     const template = await Template.findById(templateId);
 
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-    // Verify creator or admin
-    if (
-      String(template.createdBy) !== String(req.user.id) &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({
-        error: 'You do not have permission to edit this template',
-      });
-    }
-
     // Update only the fields that have been sent in the request body
     if (title !== undefined) template.title = title;
     if (description !== undefined) template.description = description;
@@ -179,22 +165,6 @@ const deleteTemplate = async (req, res) => {
   const { templateId } = req.params;
 
   try {
-    const template = await Template.findById(templateId);
-
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-    // Verify creator or admin
-    if (
-      String(template.createdBy) !== String(req.user.id) &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({
-        error: 'You do not have permission to edit this template',
-      });
-    }
-
     await Template.findByIdAndDelete(templateId);
 
     res.status(200).json({ message: 'Template deleted successfully' });
@@ -210,22 +180,6 @@ const addQuestion = async (req, res) => {
     req.body;
 
   try {
-    const template = await Template.findById(templateId);
-
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-    // Verify creator or admin
-    if (
-      String(template.createdBy) !== String(req.user.id) &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({
-        error: 'You do not have permission to edit this template',
-      });
-    }
-
     const newQuestion = {
       questionTitle,
       questionDescription,
@@ -254,20 +208,6 @@ const updateQuestion = async (req, res) => {
 
   try {
     const template = await Template.findById(templateId);
-
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-    // Verify creator or admin
-    if (
-      String(template.createdBy) !== String(req.user.id) &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({
-        error: 'You do not have permission to edit this template',
-      });
-    }
 
     const question = template.questions.id(questionId);
 
@@ -298,20 +238,6 @@ const deleteQuestion = async (req, res) => {
 
   try {
     const template = await Template.findById(templateId);
-
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-
-    // Verify creator or admin
-    if (
-      String(template.createdBy) !== String(req.user.id) &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({
-        error: 'You do not have permission to edit this template',
-      });
-    }
 
     template.questions.pull(questionId);
 

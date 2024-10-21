@@ -3,11 +3,11 @@ const { Schema } = mongoose;
 
 const questionSchema = new mongoose.Schema(
   {
-    questionTitle: { type: String, required: true },
-    questionDescription: { type: String, required: true },
-    questionType: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    type: { type: String, required: true },
     options: [String], // Options multiple choice questions
-    order: { type: Number, required: true },
+    order: { type: Number },
   },
   { _id: true }
 );
