@@ -7,7 +7,7 @@ const questionSchema = new mongoose.Schema(
     description: { type: String, required: true },
     type: { type: String, required: true },
     options: [String], // Options multiple choice questions
-    order: { type: Number },
+    order: { type: String },
   },
   { _id: true }
 );
