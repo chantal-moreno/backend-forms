@@ -1,5 +1,6 @@
 const Template = require('../models/templateModel');
 const User = require('../models/userModel');
+const addTagsToTemplate = require('../addTagsToTemplate');
 
 const newTemplate = async (req, res) => {
   try {
@@ -8,7 +9,7 @@ const newTemplate = async (req, res) => {
       description,
       questions,
       topic,
-      tags,
+      tags = [],
       isPublic,
       allowedUsers,
       image,
@@ -20,12 +21,14 @@ const newTemplate = async (req, res) => {
         .json({ message: 'At least one question is required.' });
     }
 
+    const tagIds = await addTagsToTemplate(tags);
+
     const newTemplate = new Template({
       title,
       description,
       questions,
       topic,
-      tags: tags || [],
+      tags: tagIds || [],
       isPublic: isPublic !== undefined ? isPublic : true,
       allowedUsers: allowedUsers || [],
       image: image || '',

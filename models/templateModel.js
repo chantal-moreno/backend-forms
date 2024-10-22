@@ -26,7 +26,7 @@ const TemplateSchema = new mongoose.Schema(
       required: true,
       enum: ['Education', 'Personal', 'Work', 'Other'],
     },
-    tags: [String],
+    tags: [{ type: Schema.Types.ObjectId, ref: 'Tags' }],
     image: { type: String },
     isPublic: { type: Boolean, default: true },
     allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
