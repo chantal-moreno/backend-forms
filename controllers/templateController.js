@@ -177,6 +177,26 @@ const deleteTemplate = async (req, res) => {
   }
 };
 
+const getTemplatesByTag = async (req, res) => {
+  try {
+    const { tagId } = req.params;
+    const templates = await Template.find({ tags: tagId }).populate('tags');
+
+    if (!templates) {
+      return res
+        .status(404)
+        .json({ message: 'No templates found for this tag' });
+    }
+
+    res.status(200).json(templates);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: 'Error fetching templates', error: err.message });
+  }
+};
+
 const addQuestion = async (req, res) => {
   const { templateId } = req.params;
   const { questionTitle, questionDescription, questionType, options, order } =
@@ -260,6 +280,7 @@ module.exports = {
   allTemplates,
   latestTemplates,
   deleteTemplate,
+  getTemplatesByTag,
   addQuestion,
   updateQuestion,
   deleteQuestion,

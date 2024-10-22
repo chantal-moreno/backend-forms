@@ -29,6 +29,11 @@ router.delete(
   checkTemplateOwnership,
   templateController.deleteTemplate
 );
+router.get(
+  '/templates/tag/:tagId',
+  authOptional,
+  templateController.getTemplatesByTag
+);
 router.post(
   '/template/:templateId/add-question',
   authRequired,
