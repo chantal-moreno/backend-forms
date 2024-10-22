@@ -15,5 +15,6 @@ router.patch(
   checkTemplateOwnership,
   tagController.updateTags
 );
+router.get('/tags', tagController.getAllTags);
 
 module.exports = router;
