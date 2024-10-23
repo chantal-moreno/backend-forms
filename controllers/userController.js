@@ -70,6 +70,7 @@ const signIN = async function (req, res) {
       firstName: userFound.firstName,
       lastName: userFound.lastName,
       email: userFound.email,
+      role: userFound.role,
     });
   } catch (error) {
     res.status(500).json({ message: 'Error to Sign In', error: error.message });
