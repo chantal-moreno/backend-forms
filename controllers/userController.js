@@ -23,7 +23,6 @@ const signUP = async function (req, res) {
     // Token
     const token = await createAccessToken({
       id: newUser._id,
-      role: userFound.role,
     });
     res.cookie('token', token);
 
@@ -53,9 +52,7 @@ const signIN = async function (req, res) {
 
     // User blocked
     if (userFound.status == 'Blocked') {
-      return res.status(400).json({
-        message: 'User account is blocked',
-      });
+      return res.status(400).json(['User account is blocked']);
     }
     //Update lastLogin
     userFound.lastLogin = new Date();
@@ -150,7 +147,9 @@ const blockUsers = async (req, res) => {
       return res.status(404).json({ message: 'No users found' });
     }
 
-    res.status(200).json({ message: 'Users blocked', usersBlocked });
+    res
+      .status(200)
+      .json({ message: 'Users blocked successfully!', usersBlocked });
   } catch (error) {
     res.status(500).json({
       message: 'Error blocking users',
@@ -170,7 +169,9 @@ const unblockUsers = async (req, res) => {
     if (usersUnblocked.matchedCount === 0) {
       return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'Users unblocked', usersUnblocked });
+    res
+      .status(200)
+      .json({ message: 'Users unblocked successfully!', usersUnblocked });
   } catch (error) {
     res.status(500).json({
       message: 'Error unblocking users',
@@ -187,7 +188,9 @@ const deleteUsers = async (req, res) => {
     if (!usersDeleted) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.status(200).json({ message: 'Users deleted', usersDeleted });
+    res
+      .status(200)
+      .json({ message: 'Users deleted successfully!', usersDeleted });
   } catch (error) {
     res.status(500).json({
       message: 'Error deleting users',
@@ -207,7 +210,9 @@ const addAdmin = async (req, res) => {
     if (!newAdmins) {
       return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'New admins added', newAdmins });
+    res
+      .status(200)
+      .json({ message: 'New admins added successfully!', newAdmins });
   } catch (error) {
     res.status(500).json({
       message: 'Error adding new admins',
@@ -227,7 +232,9 @@ const removeAdmin = async (req, res) => {
     if (!removeAdmins) {
       return res.status(404).json({ message: 'No users found' });
     }
-    res.status(200).json({ message: 'Admins removed', removeAdmins });
+    res
+      .status(200)
+      .json({ message: 'Admins removed successfully!', removeAdmins });
   } catch (error) {
     res.status(500).json({
       message: 'Error removing admins',

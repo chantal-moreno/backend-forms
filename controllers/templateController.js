@@ -91,7 +91,10 @@ const getTemplate = async (req, res) => {
   const { templateId } = req.params;
 
   try {
-    const template = await Template.findById(templateId);
+    const template = await Template.findById(templateId).populate(
+      'tags',
+      'name'
+    );
 
     if (!template) {
       return res.status(404).json({ error: 'Template not found' });
