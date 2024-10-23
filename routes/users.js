@@ -12,7 +12,7 @@ router.post('/sign-out', userController.signOUT);
 router.get('/account', authRequired, userController.account);
 router.get('/verify', userController.verifyToken);
 
-router.get('/all-users', authRequired, isAdmin, userController.getUsers);
+router.get('/all-users', authRequired, userController.getUsers);
 router.put('/block-users', authRequired, isAdmin, userController.blockUsers);
 router.put(
   '/unblock-users',

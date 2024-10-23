@@ -20,6 +20,21 @@ const newTemplate = async (req, res) => {
         .status(400)
         .json({ message: 'At least one question is required.' });
     }
+    if (topic == 'Select template topic') {
+      return res.status(400).json({ message: 'Select template topic' });
+    }
+    if (tags.length === 0) {
+      return res.status(400).json({ message: 'At least one tag is required' });
+    }
+
+    const isPublicBoolean =
+      isPublic === 'false' || isPublic === false ? false : true;
+    if (!isPublicBoolean && (!allowedUsers || allowedUsers.length === 0)) {
+      return res.status(400).json({
+        message:
+          'For private templates, at least one allowed user is required.',
+      });
+    }
 
     const tagIds = await addTagsToTemplate(tags);
 
@@ -28,7 +43,7 @@ const newTemplate = async (req, res) => {
       description,
       questions,
       topic,
-      tags: tagIds || [],
+      tags: tagIds,
       isPublic: isPublic !== undefined ? isPublic : true,
       allowedUsers: allowedUsers || [],
       image: image || '',
