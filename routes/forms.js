@@ -20,5 +20,10 @@ router.get(
   authRequired,
   formController.getUserFormResponse
 );
+router.put(
+  '/templates/:templateId/update-form-respons',
+  authRequired,
+  formController.updateFormResponse
+);
 
 module.exports = router;

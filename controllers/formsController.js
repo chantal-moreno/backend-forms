@@ -70,8 +70,40 @@ const getUserFormResponse = async (req, res) => {
   }
 };
 
+const updateFormResponse = async (req, res) => {
+  const { templateId } = req.params;
+  const { answers } = req.body;
+  const userId = req.user.id;
+
+  // Need to send all array answers
+  try {
+    if (!answers || answers.length === 0) {
+      return res.status(400).json({ message: 'Answers are required.' });
+    }
+
+    let formResponse = await Form.findOne({ templateId, userId });
+
+    if (!formResponse) {
+      return res.status(404).json({ message: 'Form response not found.' });
+    }
+
+    formResponse.answers = answers;
+
+    await formResponse.save();
+
+    res.status(200).json({
+      message: 'Form response updated successfully.',
+      formResponse,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating form response.' });
+  }
+};
+
 module.exports = {
   answerForm,
   getFormResponsesByTemplate,
   getUserFormResponse,
+  updateFormResponse,
 };
