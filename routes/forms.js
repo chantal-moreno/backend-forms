@@ -15,5 +15,10 @@ router.get(
   authRequired,
   formController.getFormResponsesByTemplate
 );
+router.get(
+  '/templates/:templateId/user-form-responses',
+  authRequired,
+  formController.getUserFormResponse
+);
 
 module.exports = router;

@@ -47,7 +47,31 @@ const getFormResponsesByTemplate = async (req, res) => {
   }
 };
 
+const getUserFormResponse = async (req, res) => {
+  const { templateId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const formResponse = await Form.findOne({ templateId, userId }).populate(
+      'userId',
+      'firstName lastName email'
+    );
+
+    if (!formResponse) {
+      return res
+        .status(404)
+        .json({ message: 'No form response found for this template and user' });
+    }
+
+    res.status(200).json(formResponse);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching form response' });
+  }
+};
+
 module.exports = {
   answerForm,
   getFormResponsesByTemplate,
+  getUserFormResponse,
 };
