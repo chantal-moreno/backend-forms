@@ -109,10 +109,75 @@ const deleteFormResponse = async (req, res) => {
   }
 };
 
+const getTemplatesByFormResponseCount = async (req, res) => {
+  try {
+    // Perform aggregation to count responses by templateId
+    const templatesWithResponseCount = await Form.aggregate([
+      {
+        $group: {
+          _id: '$templateId', // Group by templateId
+          answersCount: { $count: {} }, // Count answers
+        },
+      },
+      {
+        $lookup: {
+          from: 'templates', // collection name
+          localField: '_id', // Link with field _id (templateId)
+          foreignField: '_id', // field _id collection templates
+          as: 'template', // Result stored in the template field
+        },
+      },
+      {
+        $unwind: '$template', // Break down array de templates
+      },
+      {
+        $lookup: {
+          from: 'users', // Collection name
+          localField: 'template.createdBy',
+          foreignField: '_id',
+          as: 'createdByUser',
+        },
+      },
+      {
+        $unwind: '$createdByUser',
+      },
+      {
+        $addFields: {
+          'template.createdBy': {
+            _id: '$createdByUser._id',
+            firstName: '$createdByUser.firstName',
+            lastName: '$createdByUser.lastName',
+          }, // Replace createdBy with _id, firstName y lastName
+        },
+      },
+      {
+        $sort: { answersCount: -1 }, // Sort by most responses
+      },
+      {
+        $project: {
+          _id: 0, // Do not show group _id
+          template: 1, // Show template data
+        },
+      },
+    ]);
+
+    // templates array
+    const templates = templatesWithResponseCount.map((item) => item.template);
+
+    res.status(200).json({ templates });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: 'Error fetching templates', error: err.message });
+  }
+};
+
 module.exports = {
   answerForm,
   getFormResponsesByTemplate,
   getUserFormResponse,
   updateFormResponse,
   deleteFormResponse,
+  getTemplatesByFormResponseCount,
 };

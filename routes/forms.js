@@ -38,4 +38,9 @@ router.delete(
   checkFormResponseOwnership,
   formController.deleteFormResponse
 );
+router.get(
+  '/templates/by-answers-count',
+  formController.getTemplatesByFormResponseCount
+);
+
 module.exports = router;
