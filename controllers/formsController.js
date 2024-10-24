@@ -5,6 +5,9 @@ const answerForm = async (req, res) => {
   const { answers } = req.body;
 
   try {
+    if (!answers || answers.length === 0) {
+      return res.status(400).json({ error: 'Answers are required' });
+    }
     const formResponse = new Form({
       templateId,
       userId: req.user.id,

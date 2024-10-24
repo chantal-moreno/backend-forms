@@ -200,7 +200,9 @@ const deleteTemplate = async (req, res) => {
 const getTemplatesByTag = async (req, res) => {
   try {
     const { tagId } = req.params;
-    const templates = await Template.find({ tags: tagId }).populate('tags');
+    const templates = await Template.find({ tags: tagId })
+      .populate('tags')
+      .populate('createdBy', 'firstName lastName');
 
     if (!templates) {
       return res
@@ -208,7 +210,7 @@ const getTemplatesByTag = async (req, res) => {
         .json({ message: 'No templates found for this tag' });
     }
 
-    res.status(200).json(templates);
+    res.status(200).json({ templates });
   } catch (err) {
     console.error(err);
     res
