@@ -71,7 +71,7 @@ const checkFormResponseOwnership = async (req, res, next) => {
     const formResponse = await Form.findOne({ templateId, userId });
 
     if (!formResponse) {
-      return res.status(404).json({ message: 'Form response not found' });
+      return res.json({ answers: null });
     }
 
     if (

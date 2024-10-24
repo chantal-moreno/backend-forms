@@ -22,7 +22,7 @@ router.get(
 );
 router.get(
   '/templates/:templateId/user-form-responses',
-  authRequired,
+  authOptional,
   checkFormResponseOwnership,
   formController.getUserFormResponse
 );
