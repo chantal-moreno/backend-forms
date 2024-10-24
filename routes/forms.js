@@ -10,4 +10,10 @@ router.post(
   formController.answerForm
 );
 
+router.get(
+  '/templates/:templateId/form-responses',
+  authRequired,
+  formController.getFormResponsesByTemplate
+);
+
 module.exports = router;
