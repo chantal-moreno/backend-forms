@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 const User = require('./models/userModel');
 const Template = require('./models/templateModel');
+const Form = require('./models/formModel');
 
 const authRequired = (req, res, next) => {
   const { token } = req.cookies;
@@ -63,9 +64,38 @@ const checkTemplateOwnership = async (req, res, next) => {
   }
 };
 
+const checkFormResponseOwnership = async (req, res, next) => {
+  try {
+    const { templateId } = req.params;
+    const userId = req.user.id;
+    const formResponse = await Form.findOne({ templateId, userId });
+
+    if (!formResponse) {
+      return res.status(404).json({ message: 'Form response not found' });
+    }
+
+    if (
+      String(formResponse.userId) !== String(req.user.id) &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        message: 'You do not have permission to perform this action',
+      });
+    }
+
+    next();
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ message: 'Server error', error: err.message });
+  }
+};
+
 module.exports = {
   authRequired,
   isAdmin,
   authOptional,
   checkTemplateOwnership,
+  checkFormResponseOwnership,
 };

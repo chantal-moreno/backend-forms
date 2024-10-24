@@ -57,12 +57,6 @@ const getUserFormResponse = async (req, res) => {
       'firstName lastName email'
     );
 
-    if (!formResponse) {
-      return res
-        .status(404)
-        .json({ message: 'No form response found for this template and user' });
-    }
-
     res.status(200).json(formResponse);
   } catch (err) {
     console.error(err);
@@ -83,10 +77,6 @@ const updateFormResponse = async (req, res) => {
 
     let formResponse = await Form.findOne({ templateId, userId });
 
-    if (!formResponse) {
-      return res.status(404).json({ message: 'Form response not found.' });
-    }
-
     formResponse.answers = answers;
 
     await formResponse.save();
@@ -101,9 +91,28 @@ const updateFormResponse = async (req, res) => {
   }
 };
 
+const deleteFormResponse = async (req, res) => {
+  const { templateId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const formResponse = await Form.findOneAndDelete({ templateId, userId });
+
+    if (!formResponse) {
+      return res.status(404).json({ message: 'Form response not found.' });
+    }
+
+    res.status(200).json({ message: 'Form response deleted successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting form response.' });
+  }
+};
+
 module.exports = {
   answerForm,
   getFormResponsesByTemplate,
   getUserFormResponse,
   updateFormResponse,
+  deleteFormResponse,
 };
