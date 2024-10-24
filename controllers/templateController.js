@@ -106,10 +106,10 @@ const getTemplate = async (req, res) => {
   const { templateId } = req.params;
 
   try {
-    const template = await Template.findById(templateId).populate(
-      'tags',
-      'name'
-    );
+    const template = await Template.findById(templateId)
+      .populate('tags', 'name')
+      .populate('createdBy', '_id')
+      .populate('allowedUsers', '_id firstName lastName email');
 
     if (!template) {
       return res.status(404).json({ error: 'Template not found' });
@@ -127,7 +127,9 @@ const getTemplate = async (req, res) => {
 
       // Verify creator and allowed users
       const isCreator = String(template.createdBy.id) === String(req.user.id);
-      const isAllowedUser = template.allowedUsers.includes(req.user.id);
+      const isAllowedUser = template.allowedUsers.some(
+        (user) => String(user._id) === String(req.user.id)
+      );
 
       // Verify admin
       const user = await User.findById(req.user.id);
