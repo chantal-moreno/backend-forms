@@ -24,7 +24,11 @@ const signUP = async function (req, res) {
     const token = await createAccessToken({
       id: newUser._id,
     });
-    res.cookie('token', token);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+    });
 
     res.status(200).json({
       message: 'User created successfully',
@@ -62,7 +66,11 @@ const signIN = async function (req, res) {
       id: userFound._id,
       role: userFound.role,
     });
-    res.cookie('token', token);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+    });
 
     res.status(200).json({
       message: 'Sign In successfully',
